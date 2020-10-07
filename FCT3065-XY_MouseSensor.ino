@@ -8,9 +8,11 @@
  * 
  */
 
-int SCLK = 2;
-int SDIO = 3;
-int RESET = 4;
+const int SCLK = 2;
+const int SDIO = 3;
+//const int RESET = 4;
+
+byte noSleep = 0xA0;
 
 //Register Addresses from datasheet
 #define PROD_ID1 0x00
@@ -30,31 +32,31 @@ int RESET = 4;
 #define IMG_RECOG 0x0E
 
 void setup() {
+  pinMode (SCLK, OUTPUT);
   Serial.begin(115200);
-
-  reset();
+  
+  mouseInit();
   byte prodId1 = readRegister(PROD_ID1);
-  byte prodId2 = readRegister(PROD_ID2);
-  byte conf = readRegister(CONF);
   byte opMode = readRegister(OP_MODE);
   Serial.print("\nProduct ID1:");
-  Serial.print(prodId1);
+  Serial.print(prodId1,HEX);
   Serial.print("\nOperation Mode:");
-  Serial.print(opMode);
+  Serial.print(opMode,HEX);
 }
 
 void loop() {
 
 }
 
-void reset() {
-  pinMode(SCLK, OUTPUT);
-  pinMode(SDIO, INPUT);
-  pinMode(RESET, OUTPUT);
+void mouseInit(void)
+{
+  digitalWrite(SCLK, HIGH);
   digitalWrite(SCLK, LOW);
-  digitalWrite(RESET, HIGH);
-  delayMicroseconds(1);
-  digitalWrite(RESET, LOW);
+  delayMicroseconds(1); // tRESYNC = 1us (mentioned in datasheet)
+  digitalWrite(SCLK, HIGH);
+  delay(320); // tSIWTT = 320ms (mentioned in datasheet)
+  digitalWrite(SCLK, LOW);
+  writeRegister(OP_MODE, noSleep); // disable sleep mode
 }
 
 byte readRegister(byte address) {
@@ -68,7 +70,7 @@ byte readRegister(byte address) {
 
   pinMode (SDIO, INPUT);
 
-  delayMicroseconds(3); // tHOLD = 3us min.
+  delayMicroseconds(3); // tHOLD = 3us (mentioned in datasheet)
 
   byte res = 0;
   for (byte i=128; i >0 ; i >>= 1) {
@@ -78,5 +80,26 @@ byte readRegister(byte address) {
       res |= i;
   }
 
+  delayMicroseconds(3); // tHOLD = 3us min. (mentioned in datasheet)
+ 
   return res;
+}
+
+void writeRegister(byte address, byte data) {
+  address |= 0x80; // MSB indicates write mode.
+  pinMode (SDIO, OUTPUT);
+
+  for (byte i = 128; i > 0 ; i >>= 1) {
+    digitalWrite (SCLK, LOW);
+    digitalWrite (SDIO, (address & i) != 0 ? HIGH : LOW);
+    digitalWrite (SCLK, HIGH);
+  }
+
+  for (byte i = 128; i > 0 ; i >>= 1) {
+    digitalWrite (SCLK, LOW);
+    digitalWrite (SDIO, (data & i) != 0 ? HIGH : LOW);
+    digitalWrite (SCLK, HIGH);
+  }
+
+  delayMicroseconds(100);
 }
