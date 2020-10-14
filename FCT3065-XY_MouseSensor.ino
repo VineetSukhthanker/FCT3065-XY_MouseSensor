@@ -2,17 +2,15 @@
  * Program to interface FCT3065-XY Optical Mouse
  * Sensor with Arduino.
  * 
+ * This code detects when mouse is moved and also
+ * prints the change in x direction and change in y
+ * direction in the serial monitor.
+ * 
  * Author: Vineet Sukhthanker
  * Date: 6 October 2020
  * 
  * 
  */
-
-const int SCLK = 2;
-const int SDIO = 3;
-//const int RESET = 4;
-
-byte noSleep = 0xA0;
 
 //Register Addresses from datasheet
 #define PROD_ID1 0x00
@@ -31,24 +29,36 @@ byte noSleep = 0xA0;
 #define IMG_THRESHOLD 0x0D
 #define IMG_RECOG 0x0E
 
+const int SCLK = 2;
+const int SDIO = 3;
+
+byte noSleep = 0xA0;
+
+int i = 0;
 void setup() {
-  pinMode (SCLK, OUTPUT);
   Serial.begin(115200);
-  
+  pinMode (SCLK, OUTPUT);
   mouseInit();
+  
   byte prodId1 = readRegister(PROD_ID1);
-  byte opMode = readRegister(OP_MODE);
-  Serial.print("\nProduct ID1:");
-  Serial.print(prodId1,HEX);
-  Serial.print("\nOperation Mode:");
-  Serial.print(opMode,HEX);
+  Serial.print((prodId1==0x31)?"\nDevice OK":"\nUnknown Device"); // checks for product ID
 }
 
 void loop() {
-
+  int motion = readRegister(MOTION_STATUS); // read motion status register
+  if(motion==0x81){
+    Serial.print("\nMoved!");
+    int delta_x = readRegister(DEL_X); // read delta x register
+    int delta_y = readRegister(DEL_Y); // read delta y register
+    Serial.print("\nX:");
+    Serial.print(delta_x);
+    Serial.print(" Y:");
+    Serial.print(delta_y);
+  }
+  delay(1000);
 }
 
-void mouseInit(void)
+void mouseInit(void) // function to initialize optical sensor.
 {
   digitalWrite(SCLK, HIGH);
   digitalWrite(SCLK, LOW);
