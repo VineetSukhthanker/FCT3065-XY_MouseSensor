@@ -1,4 +1,4 @@
-# FCT3065-XY Optical Mouse Sensor
+# FCT3065-XY Optical Mouse Sensor with Arduino
 
 Program to interface FCT3065-XY Optical Mouse Sensor with Arduino.
 This code detects when mouse is moved and also prints the change
@@ -7,6 +7,17 @@ in x direction and change in y direction in the serial monitor.
 Datasheets given are of other related Optical Mouse Sensors which I
 referred to get register addresses and configurations available for
 this mouse sensor as I couldn't find a datasheet for FCT3065-XY.
+
+## Connections
+
+[Mouse Sensor Pinout](MouseSensor.png)
+
+1. Connect pin 4 (SCLK/ Clock) of sensor to pin 2 of Arduino.
+2. Connect pin 3 (SDIO/ Data) of sensor to pin 3 of Arduino
+
+**Arduino uses 5v voltage logic and sensor uses 3.3v voltage logic**
+**Use a voltage level shifter or a voltage divider to interface sensor with arduino**
+**5 volts can damage the Sensor**
 
 ## What is working
 
