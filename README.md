@@ -17,7 +17,7 @@ this mouse sensor as I couldn't find a datasheet for FCT3065-XY.
 3. Connect pin 4 (SCLK/ Clock) of sensor to pin 2 of Arduino.
 4. Connect pin 3 (SDIO/ Data) of sensor to pin 3 of Arduino.
 
-**Arduino uses 5v voltage logic and sensor uses 3.3v voltage logic**
+**Arduino uses 5v logic and sensor uses 2.7-3.3v logic**
 **Use a voltage level shifter or a voltage divider to interface sensor with arduino**
 **5 volts can damage the Sensor**
 
@@ -35,6 +35,18 @@ this mouse sensor as I couldn't find a datasheet for FCT3065-XY.
 
 - Sensor resolution
 - Frames per second
+
+## Compatible Sensors ( List is incomplete )
+
+1. Pixart(3204DB,3204L,3204LL,3204UL,3205,3207)
+2. Sigma 8630/8630A/8640/8650A
+3. OM15,0M16
+4. PAW3212
+5. VT108/KA8
+6. FCT3065
+7. FH8835
+8. YS8008
+9. S8321
 
 ## Resources
 
